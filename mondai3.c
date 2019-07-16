@@ -18,6 +18,11 @@ typedef struct tnode{
   lnode* info_last;
 }tnode;
 
+typedef struct onode{
+  lnode* data;
+  struct onode* next;
+}onode;
+
 
 tnode* createTnode(char* str);
 void insertTerm(tnode** head,tnode *node);
@@ -29,18 +34,25 @@ void printList(lnode* head);
 void freeList(lnode* head);
 void insertTermAndList(tnode** head,char* str,int id);
 tnode* search(tnode* head,char* query);
+void push(onode** head,lnode* str);
+void pop(onode** head);
+lnode* andL(lnode* l1,lnode* l2);
+lnode* orL(lnode* l1,lnode* l2);
+
 
 int main(int argc, char* args[]){
   tnode* head;
-  lnode *new_node;
+  lnode *new_node,*l;
   tnode* aux;
   char buffer[BUFF_SIZE];
   char *token;
   int flag;
   int id;
+  onode *list;
   FILE *p;
 
   head = NULL;
+  list = NULL;
 
   if(argc<2){
     fprintf(stderr,"Please introduce the name of the file\n");
@@ -71,14 +83,36 @@ int main(int argc, char* args[]){
     }
   }
 
-  scanf("%s",buffer);
-  if((aux = search(head,buffer))==NULL)
-    printf("Not found\n");
-  else 
-    printList(aux->info);
+  fgets(buffer,BUFF_SIZE,stdin);
+  buffer[strlen(buffer)-1] = '\0';
+  
+  token = strtok(buffer," ");
+  while(token != NULL){
+    if(strcmp(token,"AND")==0){
+      /*l = list->data;
+      pop(&list);
+      l = andL(l,list->data);
+      pop(&list);
+      push(&list,l);*/
+    }
+    else if(strcmp(token,"OR")==0){ 
+      l = list->data;
+      pop(&list);
+      l = orL(l,list->data);
+      pop(&list);
+      push(&list,l);
+    }
+    else{
+      aux = search(head,token);
+      push(&list,aux->info);
+    }
+    token = strtok(NULL," ");
+  }
+  printList(list->data);
+  pop(&list);
   
   freeTree(head);
-  
+
   return 0;
 }
 
@@ -189,4 +223,60 @@ tnode* search(tnode* head,char* query){
       return out;
   }
   return NULL;
+}
+
+void push(onode** head,lnode* list){
+  onode* new;
+  new = (onode*)malloc(sizeof(onode));
+  new->data = list;
+  new->next = (*head);
+  *head = new;
+}
+void pop(onode** head){
+  onode* temp;
+  temp = (*head)->next;
+  free(*head);
+  *head = temp;
+}
+
+lnode* andL(lnode* l1,lnode* l2){
+  lnode* out;
+  out = NULL;
+  while(l1!=NULL){
+    while(l2->data > l1->data){
+
+    }
+  }
+}
+lnode* orL(lnode* l1,lnode* l2){
+  lnode* out,*last;
+  out = NULL;
+  last = NULL;
+  
+  while(l1!=NULL || l2!=NULL){
+    while(l1->data > l2->data){
+      insertLnode(&out,&last,createLnode(l2->data));
+      l2 = l2->next;
+      if(l2==NULL) break;
+    }
+    if(l2!=NULL){
+      while(l1->data < l2->data){
+        insertLnode(&out,&last,createLnode(l1->data));
+        l1 = l1->next;
+        if(l1==NULL) break;
+      } 
+    }
+    else{
+      while(l1!=NULL){
+        insertLnode(&out,&last,createLnode(l1->data));
+        l1 = l1->next;
+      }
+      break;
+    }
+  }
+  return out;
+
+  //if(l1!=NULL) return l1;
+  //else if(l2!=NULL) return l2;
+  //return NULL;
 }
