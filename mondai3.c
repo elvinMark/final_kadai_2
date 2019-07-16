@@ -48,7 +48,7 @@ int main(int argc, char* args[]){
   char *token;
   int flag;
   int id;
-  onode *list;
+  onode *list,*temp;
   FILE *p;
 
   head = NULL;
@@ -89,11 +89,11 @@ int main(int argc, char* args[]){
   token = strtok(buffer," ");
   while(token != NULL){
     if(strcmp(token,"AND")==0){
-      /*l = list->data;
+      l = list->data;
       pop(&list);
       l = andL(l,list->data);
       pop(&list);
-      push(&list,l);*/
+      push(&list,l);
     }
     else if(strcmp(token,"OR")==0){ 
       l = list->data;
@@ -104,13 +104,26 @@ int main(int argc, char* args[]){
     }
     else{
       aux = search(head,token);
-      push(&list,aux->info);
+      if(aux==NULL)
+        push(&list,NULL);
+      else
+        push(&list,aux->info);
     }
     token = strtok(NULL," ");
   }
-  printList(list->data);
-  pop(&list);
-  
+  if(list->data != NULL){
+    printList(list->data);
+    pop(&list);  
+  }
+  else
+    printf("Not Found\n");
+  temp = list;
+  while(list != NULL){
+    temp = list->next;
+    freeList(list->data);
+    free(list);
+    list = temp;
+  }
   freeTree(head);
 
   return 0;
@@ -240,12 +253,22 @@ void pop(onode** head){
 }
 
 lnode* andL(lnode* l1,lnode* l2){
-  lnode* out;
+  lnode* out,*last;
   out = NULL;
+  last = NULL;
+  if(l1 == NULL || l2==NULL)
+    return NULL;
   while(l1!=NULL){
     while(l2->data > l1->data){
-
+      l1 = l1->next;
+      if(l1==NULL)
+        return out;
     }
+    if(l1->data == l2->data)
+      insertLnode(&out,&last,createLnode(l1->data));
+    l2 = l2->next;
+    if(l2==NULL)
+      return out;
   }
 }
 lnode* orL(lnode* l1,lnode* l2){
@@ -253,30 +276,33 @@ lnode* orL(lnode* l1,lnode* l2){
   out = NULL;
   last = NULL;
   
-  while(l1!=NULL || l2!=NULL){
-    while(l1->data > l2->data){
+  if(l2==NULL)
+    return l1;
+  
+  if(l1==NULL)
+    return l2;
+
+  while(l1!=NULL){
+    while(l2->data < l1->data){
       insertLnode(&out,&last,createLnode(l2->data));
       l2 = l2->next;
-      if(l2==NULL) break;
-    }
-    if(l2!=NULL){
-      while(l1->data < l2->data){
-        insertLnode(&out,&last,createLnode(l1->data));
-        l1 = l1->next;
-        if(l1==NULL) break;
-      } 
-    }
-    else{
-      while(l1!=NULL){
-        insertLnode(&out,&last,createLnode(l1->data));
-        l1 = l1->next;
+      if(l2==NULL){
+        while(l1!=NULL){
+          insertLnode(&out,&last,createLnode(l1->data));
+          l1 = l1->next;
+        }
+        break;
       }
-      break;
+    }
+    if(l1!=NULL){
+      insertLnode(&out,&last,createLnode(l1->data));
+      l1 = l1->next;
     }
   }
+  while(l2!=NULL){
+    insertLnode(&out,&last,createLnode(l2->data));
+    l2 = l2->next;
+  }
+  
   return out;
-
-  //if(l1!=NULL) return l1;
-  //else if(l2!=NULL) return l2;
-  //return NULL;
 }
