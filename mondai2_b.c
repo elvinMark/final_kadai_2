@@ -146,10 +146,11 @@ void insertLnode(lnode** head,lnode* new){
   else{
     temp = *head;
     while(temp->next !=NULL){
-      if(temp->next->id > new->id)
+      if(temp->next->id >= new->id)
         break;
       temp = temp->next;
     }
+    if(temp->next!=NULL && temp->next->id == new->id) return ;
     new->next = temp->next;
     temp->next = new;
   }
