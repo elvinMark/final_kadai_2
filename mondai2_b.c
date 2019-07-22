@@ -7,6 +7,7 @@
 
 typedef struct lnode{
   int data;
+  int id;
   struct lnode* next;
 }lnode;
 
@@ -22,11 +23,11 @@ tnode* createTnode(char* str);
 void insertTerm(tnode** head,tnode *node);
 void printTree(tnode* head);
 void freeTree(tnode* head);
-lnode* createLnode(int id);
+lnode* createLnode(int id,int id1);
 void insertLnode(lnode** head,lnode* new);
 void printList(lnode* head);
 void freeList(lnode* head);
-void insertTermAndList(tnode** head,char* str,int id);
+void insertTermAndList(tnode** head,char* str,int id,int id1);
 tnode* search(tnode* head,char* query);
 
 int main(int argc, char* args[]){
@@ -37,6 +38,7 @@ int main(int argc, char* args[]){
   char *token;
   int flag;
   int id;
+  int id1;
   FILE *p;
 
   head = NULL;
@@ -50,19 +52,24 @@ int main(int argc, char* args[]){
   while(fgets(buffer,BUFF_SIZE,p)){
     buffer[strlen(buffer)-1] = '\0';
     token = strtok(buffer,"\t");
-    flag = 1;
+    flag = 0;
     id = 0;
+    id1 = 0;
     while(token!=NULL){
-      if(flag){
+      if(flag==0){
         id = atoi(token);
-        flag = 0;
+        flag++;
+      }
+      else if(flag == 1){
+        id1 = atoi(token);
+        flag++;
       }
       else{
         aux = search(head,token);
         if(aux==NULL)
-          insertTermAndList(&head,token,id);
+          insertTermAndList(&head,token,id,id1);
         else{
-          new_node = createLnode(id);
+          new_node = createLnode(id,id1);
           insertLnode(&(aux->info),new_node);
         }
       }
@@ -124,10 +131,11 @@ void freeTree(tnode *head){
   freeTree(l);
 }
 
-lnode* createLnode(int id){
+lnode* createLnode(int id,int id1){
   lnode* new;
   new = (lnode *)malloc(sizeof(lnode));
   new->data=id;
+  new->id = id1;
   new->next = NULL;
   return new;
 }
@@ -138,7 +146,7 @@ void insertLnode(lnode** head,lnode* new){
   else{
     temp = *head;
     while(temp->next !=NULL){
-      if(temp->next->data > new->data)
+      if(temp->next->id > new->id)
         break;
       temp = temp->next;
     }
@@ -160,11 +168,11 @@ void freeList(lnode* head){
     head = temp;
   }
 }
-void insertTermAndList(tnode** head,char* str,int id){
+void insertTermAndList(tnode** head,char* str,int id,int id1){
   tnode* new_n;
   lnode* new_l;
   new_n = createTnode(str);
-  new_l = createLnode(id);
+  new_l = createLnode(id,id1);
   new_n->info = new_l;
   if(*head == NULL){
     *head = new_n;

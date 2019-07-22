@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define STR_SIZE 20
+#define STR_SIZE 21
 
 typedef struct tnode{
   char data[STR_SIZE];

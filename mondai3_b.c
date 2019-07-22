@@ -124,7 +124,7 @@ int main(int argc, char* args[]){
     pop(&list);  
   }
   else
-    printf("Not Found\n");
+    printf("Not found\n");
   temp = list;
   while(list != NULL){
     temp = list->next;
@@ -278,6 +278,7 @@ lnode* andL(lnode* l1,lnode* l2){
     if(l2==NULL)
       return out;
   }
+  return NULL;
 }
 lnode* orL(lnode* l1,lnode* l2){
   lnode* out,*last;
