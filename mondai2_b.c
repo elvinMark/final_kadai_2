@@ -140,19 +140,28 @@ lnode* createLnode(int id,int id1){
   return new;
 }
 void insertLnode(lnode** head,lnode* new){
-  lnode *temp;
-  if(*head == NULL)
+  lnode *temp,*temp1;
+  if(*head == NULL){
     *head = new;
+  }
   else{
-    temp = *head;
-    while(temp->next !=NULL){
-      if(temp->next->id >= new->id)
-        break;
-      temp = temp->next;
+    temp=(*head);
+    temp1 = temp->next;
+    if(temp->id < new->id){
+      new->next = *head;
+      (*head) = new;
     }
-    if(temp->next!=NULL && temp->next->id == new->id) return ;
-    new->next = temp->next;
-    temp->next = new;
+    else{
+      while(temp1 != NULL){
+        if(temp1->id < new->id) break;
+        temp1 = temp1->next;
+        temp = temp->next;
+      }
+      if((temp->data != new->data)){
+        new->next = temp1;
+        temp->next = new;
+      }
+    }
   }
 }
 void printList(lnode* head){
