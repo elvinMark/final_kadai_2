@@ -3,7 +3,7 @@
 #include <string.h>
 
 #define STR_SIZE 22
-#define BUFF_SIZE 1005
+#define BUFF_SIZE 1025
 
 typedef struct lnode{
   int data;
@@ -51,7 +51,7 @@ int main(int argc, char* args[]){
   p = fopen(args[1],"r");
   while(fgets(buffer,BUFF_SIZE,p)){
     buffer[strlen(buffer)-1] = '\0';
-    token = strtok(buffer,"\t");
+    token = strtok(buffer,"\t ");
     flag = 0;
     id = 0;
     id1 = 0;
@@ -73,7 +73,7 @@ int main(int argc, char* args[]){
           insertLnode(&(aux->info),new_node);
         }
       }
-      token = strtok(NULL," ");
+      token = strtok(NULL,"\t ");
     }
   }
 
@@ -157,10 +157,9 @@ void insertLnode(lnode** head,lnode* new){
         temp1 = temp1->next;
         temp = temp->next;
       }
-      if((temp->data != new->data)){
-        new->next = temp1;
-        temp->next = new;
-      }
+      if(temp->data == new->data) return;
+      new->next = temp1;
+      temp->next = new;
     }
   }
 }
